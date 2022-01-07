@@ -32,7 +32,7 @@ Assign some keys to table rows:
 
     textTable.addKeyedRow("myKey", 1, "Moscow", 1, "MOS", "NULL");
 
-Then you can refer to this line using the key:
+Then you can refer to this row using the key:
 
     Object[] cells = textTable.getRow("myKey");
 
