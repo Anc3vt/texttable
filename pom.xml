@@ -13,10 +13,17 @@
     <artifactId>texttable</artifactId>
     <version>0.0.1</version>
 
+    <licenses>
+        <license>
+            <name>GNU General Public License v3 (GPLv3)</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+        </license>
+    </licenses>
+
     <distributionManagement>
         <repository>
             <id>ancevt</id>
-            <url>https://ancevt.ru:10443/releases</url>
+            <url>http://ancevt.ru:8080/releases</url>
         </repository>
     </distributionManagement>
 
