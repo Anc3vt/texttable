@@ -1,5 +1,8 @@
 package ru.ancevt.util.texttable;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,69 +15,57 @@ public class TextTable {
 		+----+--------------------+------------+------+------+
 		| id | name               | country_id | code | desc |
 		+----+--------------------+------------+------+------+
-		|  1 | Москва             | 1          | MOS  | NULL |
-		|  2 | Нью-Йорк           | 3          | NY   | NULL |
-		|  3 | Киев               | 2          | KI   | NULL |
-		|  6 | Вашингтон          | 3          | WS   | NULL |
-		|  7 | Самара             | 1          | SM   | NULL |
+		|  1 | Moscow             | 1          | MOS  | NULL |
+		|  2 | New-York           | 3          | NY   | NULL |
+		|  3 | Kiyv               | 2          | KI   | NULL |
+		|  6 | Washington         | 3          | WS   | NULL |
+		|  7 | Samara             | 1          | SM   | NULL |
 		+----+--------------------+------------+------+------+
 */
 		
-		final TextTable textTable = new TextTable();
-		textTable.setColumnNames(new String[] {"id", "name", "code"});
-		textTable.setMaxStringLength(15);
-		textTable.addRow(new String[] {"1", "Moscow", "RU"});
-		textTable.addRow(new String[] {"2", "St.Petersburg", "RU"});
-		textTable.addRow(new Object[] {3, "Rostov-on-Don", ""});
-		
+		final TextTable textTable = new TextTable("id", "name", "country_id", "code", "desc");
+
+		textTable.addRow(1, "Moscow",     1, "MOS", "NULL");
+		textTable.addRow(2, "New-York",   3, "NY",  "NULL");
+		textTable.addRow(3, "Kiyv",       2, "KI",  "NULL");
+		textTable.addRow(6, "Washington", 4, "WS",  "NULL");
+		textTable.addRow(7, "Samara",     1, "SM",  "NULL");
+
 		System.out.println(textTable.render());
 	}
-	
-	private List<TextTableRow> rows;
-	private String[] columnNames;
-	private int[] columnSizes;
+
+	@Getter
+	@Setter
 	private int maxStringLength;
+
+	@Getter
+	@Setter
+	private String[] columnNames;
+	
+	private final List<TextTableRow> rows;
+
+	private int[] columnSizes;
+
 	
 	public TextTable() {
 		rows = new ArrayList<>();
-		maxStringLength = DEFAULT_MAX_STRING_LENGTH;
+		setMaxStringLength(DEFAULT_MAX_STRING_LENGTH);
 	}
 	
-	public TextTable(String[] columnNames) {
+	public TextTable(String... columnNames) {
 		this();
 		setColumnNames(columnNames);
 	}
-	
-	public void setColumnNames(String[] columnNames) {
-		this.columnNames = columnNames;
-	}
-	
-	public String[] getColumnNames() {
-		return columnNames;
-	}
-	
-	public void addRow(Object[] rowData) {
-		final TextTableRow row = new TextTableRow();
-		row.set(rowData);
-		rows.add(row);
-	}
-	
-	public void addRow(Object[] rowData, Object key) {
-		final TextTableRow row = new TextTableRow();
-		row.set(rowData);
-		row.setKey(key);
-		rows.add(row);
-	}
-	
-	public void addRow(List<Object> rowData) {
-		final TextTableRow row = new TextTableRow();
-		row.set(rowData);
-		rows.add(row);
-	}
 
-	public void addRow(List<Object> rowData, Object key) {
+	public void addRow(Object... cells) {
 		final TextTableRow row = new TextTableRow();
-		row.set(rowData);
+		row.setData(cells);
+		rows.add(row);
+	}
+	
+	public void addKeyedRow(Object key, Object[] cells) {
+		final TextTableRow row = new TextTableRow();
+		row.setData(cells);
 		row.setKey(key);
 		rows.add(row);
 	}
@@ -86,13 +77,13 @@ public class TextTable {
 	public Object[] getRow(Object key) {
 		for(final TextTableRow row : rows)
 			if(row.getKey() == key || key.equals(row.getKey()))
-				return row.rowData();
+				return row.getData();
 		
 		return new Object[0];
 	}
 	
 	public Object[] getRow(int index) {
-		return rows.get(index).rowData();
+		return rows.get(index).getData();
 	}
 	
 	public void removeRow(Object key) {
@@ -129,7 +120,7 @@ public class TextTable {
 		
 		return sb.toString();
 	}
-	
+
 	private String renderDecor() {
 		final StringBuilder sb = new StringBuilder();
 		
@@ -201,7 +192,7 @@ public class TextTable {
 		} else {
 			int max = 0;
 			for(final TextTableRow row : rows) {
-				final Object[] cells = row.rowData();
+				final Object[] cells = row.getData();
 				if(cells.length > max) max = cells.length;
 			}
 			columnCount = max;
@@ -248,15 +239,5 @@ public class TextTable {
 		}
 	}
 
-	public int getMaxStringLength() {
-		return maxStringLength;
-	}
-
-	public void setMaxStringLength(int value) {
-		this.maxStringLength = value;
-	}
-	
-	
-	
 }
 
