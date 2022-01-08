@@ -21,7 +21,7 @@
     <distributionManagement>
         <repository>
             <id>ancevt</id>
-            <url>http://ancevt.ru:8080/releases</url>
+            <url>https://ancevt.ru:10443/releases</url>
         </repository>
     </distributionManagement>
 
