@@ -18,10 +18,18 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <id>ancevt</id>
+            <name>Ancevt</name>
+            <email>i@ancevt.ru</email>
+        </developer>
+    </developers>
+
     <distributionManagement>
         <repository>
             <id>ancevt</id>
-            <url>https://ancevt.ru:10443/releases</url>
+            <url>https://maven.ancevt.ru/releases</url>
         </repository>
     </distributionManagement>
 
