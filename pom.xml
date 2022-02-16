@@ -9,7 +9,7 @@
 
     <groupId>ru.ancevt.util</groupId>
     <artifactId>texttable</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <licenses>
         <license>
@@ -31,7 +31,23 @@
             <id>ancevt</id>
             <url>https://packages.ancevt.ru/releases</url>
         </repository>
+        <snapshotRepository>
+            <id>ancevt-snapshots</id>
+            <url>https://packages.ancevt.ru/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>ancevt</id>
+            <url>https://packages.ancevt.ru/releases</url>
+        </repository>
+        <repository>
+            <id>ancevt-snapshots</id>
+            <url>https://packages.ancevt.ru/snapshots</url>
+        </repository>
+    </repositories>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
