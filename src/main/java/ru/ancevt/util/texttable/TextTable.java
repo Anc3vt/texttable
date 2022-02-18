@@ -49,6 +49,19 @@ public class TextTable {
 		textTable.addRow(7, "Samara",     1, "SM",  "NULL");
 
 		System.out.println(textTable.render());
+
+		System.out.println();
+
+		final TextTable textTable2 = new TextTable("id", "name", "country_id", "code", "desc");
+		textTable2.setDecorEnabled(false);
+
+		textTable2.addRow(1, "Moscow0",     1, "MOS", "NULL");
+		textTable2.addRow(2, "New-York",   3, "NY",  "NULL");
+		textTable2.addRow(3, "Kiyv",       2, "KI",  "NULL");
+		textTable2.addRow(6, "Washington", 4, "WS",  "NULL");
+		textTable2.addRow(7, "Samara0",     1, "SM",  "NULL");
+
+		System.out.println(textTable2.render());
 	}
 
 	@Getter
@@ -63,15 +76,35 @@ public class TextTable {
 
 	private int[] columnSizes;
 
-	
+	private boolean decorEnabled;
+
 	public TextTable() {
 		rows = new ArrayList<>();
 		setMaxStringLength(DEFAULT_MAX_STRING_LENGTH);
+		decorEnabled = true;
+	}
+
+	public TextTable(boolean decorEnabled, String... columnNames) {
+		this(columnNames);
+		this.decorEnabled = decorEnabled;
+	}
+
+	public TextTable(boolean decorEnabled) {
+		this();
+		this.decorEnabled = decorEnabled;
 	}
 	
 	public TextTable(String... columnNames) {
 		this();
 		setColumnNames(columnNames);
+	}
+
+	public void setDecorEnabled(boolean decorEnabled) {
+		this.decorEnabled = decorEnabled;
+	}
+
+	public boolean isDecorEnabled() {
+		return decorEnabled;
 	}
 
 	public void addRow(Object... cells) {
@@ -126,7 +159,8 @@ public class TextTable {
 		detectColumnSizes();
 		
 		sb.append(columnNames != null ? renderHeader() : renderDecor());
-		sb.append('\n');
+
+		if(isDecorEnabled()) sb.append('\n');
 		
 		for(int i = 0; i < size(); i ++) {
 			sb.append(renderLine(getRow(i)));
@@ -139,6 +173,8 @@ public class TextTable {
 	}
 
 	private String renderDecor() {
+		if(!decorEnabled) return "";
+
 		final StringBuilder sb = new StringBuilder();
 		
 		sb.append('+');
@@ -154,7 +190,7 @@ public class TextTable {
 	
 	private String renderHeader() {
 		return renderDecor() +
-				'\n' +
+				(isDecorEnabled() ? '\n' : "") +
 				renderLine(columnNames) +
 				'\n' +
 				renderDecor();
@@ -163,7 +199,7 @@ public class TextTable {
 	private String renderLine(Object[] cells) {
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append('|');
+		if(isDecorEnabled()) sb.append('|');
 		
 		for (int i = 0; i < cells.length; i++) {
 			if(i >= columnSizes.length) break;
@@ -177,7 +213,9 @@ public class TextTable {
 			sb.append(n);
 			final int spacesLeftToRender = getSpacesLeft(n, columnSizes[i]);
 			sb.append(spaces(spacesLeftToRender));
-			sb.append('|');
+
+
+			if(isDecorEnabled()) sb.append('|');
 		}
 		
 		if (cells.length < columnSizes.length) {
