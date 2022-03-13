@@ -15,7 +15,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package ru.ancevt.util.texttable;
+package com.ancevt.util.texttable;
 
 import lombok.Data;
 
