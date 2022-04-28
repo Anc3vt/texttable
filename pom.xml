@@ -28,24 +28,14 @@
 
     <distributionManagement>
         <repository>
-            <id>ancevt</id>
-            <url>https://packages.ancevt.com/releases</url>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
         </repository>
-        <snapshotRepository>
-            <id>ancevt-snapshots</id>
-            <url>https://packages.ancevt.com/snapshots</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
-        <repository>
-            <id>ancevt</id>
-            <url>https://packages.ancevt.com/releases</url>
-        </repository>
-        <repository>
-            <id>ancevt-snapshots</id>
-            <url>https://packages.ancevt.com/snapshots</url>
-        </repository>
+
     </repositories>
 
 
@@ -54,9 +44,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
 
-        <lombok.version>1.18.22</lombok.version>
+        <github.global.server>github</github.global.server>
+        <github.maven-plugin>0.12</github.maven-plugin>
 
+        <lombok.version>1.18.24</lombok.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     </properties>
 
     <dependencies>
@@ -78,6 +72,45 @@
                 <configuration>
                     <release>${java.version}</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>${github.maven-plugin}</version>
+                <configuration>
+                    <message>Maven artifacts for ${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                    <branch>refs/heads/mvn-repo</branch>
+                    <includes><include>**/*</include></includes>
+                    <repositoryName>texttable</repositoryName>
+                    <repositoryOwner>Anc3vt</repositoryOwner>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
