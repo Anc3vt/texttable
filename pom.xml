@@ -13,8 +13,8 @@
 
     <licenses>
         <license>
-            <name>GNU General Public License v3 (GPLv3)</name>
-            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+            <name>Apache License Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
 
@@ -25,19 +25,6 @@
             <email>i@ancevt.ru</email>
         </developer>
     </developers>
-
-    <distributionManagement>
-        <repository>
-            <id>internal.repo</id>
-            <name>Temporary Staging Repository</name>
-            <url>file://${project.build.directory}/mvn-repo</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-
-    </repositories>
-
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,6 +39,38 @@
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>ancevt</id>
+            <name>Ancevt packages repository</name>
+            <url>https://packages.ancevt.com/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>ancevt-snapshots</id>
+            <name>Ancevt packages repository (snapshots)</name>
+            <url>https://packages.ancevt.com/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>ancevt</id>
+            <url>https://packages.ancevt.com/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ancevt-snapshot</id>
+            <url>https://packages.ancevt.com/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
