@@ -38,6 +38,16 @@ public class TextTable {
 		|  6 | Washington         | 3          | WS   | NULL |
 		|  7 | Samara             | 1          | SM   | NULL |
 		+----+--------------------+------------+------+------+
+
+		ssa_role_name  Прикрепление сканированных подлинников документов
+        r_object_id    004a000000057e9a
+        ssa_name       Ответственный за сканирование ОРД
+        r_object_type  nt_doc_role
+        i_vstamp       2
+        ssa_filial_nameДемонстрационная организация
+        sida_filial    000b000000007536
+        ssa_role       scanning
+
 */
 
         final TextTable textTable = new TextTable("id", "name", "country_id", "code", "desc");
@@ -45,7 +55,7 @@ public class TextTable {
         textTable.addRow(1, "Moscow", 1, "MOS", "NULL");
         textTable.addRow(2, "New-York", 3, "NY", "NULL");
         textTable.addRow(3, "Kiev", 2, "KI", "NULL");
-        textTable.addRow(6, "Washington", 4, "WS", "NULL");
+        textTable.addRow(6, "ssa_filial_name", 4, "WS", "NULL");
         textTable.addRow(7, "Samara", 1, "SM", "NULL");
 
         System.out.println(textTable.render());
@@ -58,10 +68,25 @@ public class TextTable {
         textTable2.addRow(1, "Moscow0", 1, "MOS", "NULL");
         textTable2.addRow(2, "New-York", 3, "NY", "NULL");
         textTable2.addRow(3, "Kiev", 2, "KI", "NULL");
-        textTable2.addRow(6, "Washington", 4, "WS", "NULL");
+        textTable2.addRow(6, "ssa_filial_name", 4, "WS", "NULL");
         textTable2.addRow(7, "Samara0", 1, "SM", "NULL");
 
         System.out.println(textTable2.render());
+
+
+        TextTable textTable3 = new TextTable(false,"Key", "Value");
+        textTable3.addRow("ssa_role_name", "Прикрепление сканированных подлинников документов");
+        textTable3.addRow("r_object_id", "004a000000057e9a");
+        textTable3.addRow("ssa_name", "Ответственный за сканирование ОРД");
+        textTable3.addRow("r_object_type", "nt_doc_role");
+        textTable3.addRow("i_vstamp", "2");
+        textTable3.addRow("ssa_filial_name", "Демонстрационная организация");
+        textTable3.addRow("sida_filial", "000b000000007536");
+        textTable3.addRow("ssa_role", "scanning");
+
+
+        System.out.println(textTable3.render());
+
     }
 
     @Getter
@@ -269,7 +294,7 @@ public class TextTable {
                     final int stringLength = string.length();
 
                     if (stringLength > columnSizes[j])
-                        columnSizes[j] = stringLength + 1;
+                        columnSizes[j] = stringLength + 2;
                 }
             }
         }
@@ -288,7 +313,7 @@ public class TextTable {
                 final int stringLength = string.length();
 
                 if (stringLength > columnSizes[j])
-                    columnSizes[j] = stringLength + 2;
+                    columnSizes[j] = stringLength + 3;
             }
         }
     }
