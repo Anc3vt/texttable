@@ -9,7 +9,7 @@
 
     <groupId>com.ancevt.util</groupId>
     <artifactId>texttable</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
 
     <licenses>
         <license>
@@ -61,7 +61,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>8</java.version>
+        <java.version>1.8</java.version>
 
         <lombok.version>1.18.24</lombok.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
@@ -77,6 +77,11 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.0.0.M1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -86,7 +91,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <release>${java.version}</release>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -108,5 +114,43 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>assembly</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.6.0</version>
+
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addClasspath/>
+                                    <mainClass>com.ancevt.util.texttable.TextTable</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>texttable</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

@@ -20,74 +20,18 @@ package com.ancevt.util.texttable;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class TextTable {
 
     private static final int DEFAULT_MAX_STRING_LENGTH = 100;
+    public static final int PADDING_COLUMN_NAMES = 2;
+    public static final int PADDING_COLUMN = 3;
 
-    public static void main(String[] args) {
-/*
-		+----+--------------------+------------+------+------+
-		| id | name               | country_id | code | desc |
-		+----+--------------------+------------+------+------+
-		|  1 | Moscow             | 1          | MOS  | NULL |
-		|  2 | New-York           | 3          | NY   | NULL |
-		|  3 | Kiev               | 2          | KI   | NULL |
-		|  6 | Washington         | 3          | WS   | NULL |
-		|  7 | Samara             | 1          | SM   | NULL |
-		+----+--------------------+------------+------+------+
-
-		ssa_role_name  Прикрепление сканированных подлинников документов
-        r_object_id    004a000000057e9a
-        ssa_name       Ответственный за сканирование ОРД
-        r_object_type  nt_doc_role
-        i_vstamp       2
-        ssa_filial_nameДемонстрационная организация
-        sida_filial    000b000000007536
-        ssa_role       scanning
-
-*/
-
-        final TextTable textTable = new TextTable("id", "name", "country_id", "code", "desc");
-
-        textTable.addRow(1, "Moscow", 1, "MOS", "NULL");
-        textTable.addRow(2, "New-York", 3, "NY", "NULL");
-        textTable.addRow(3, "Kiev", 2, "KI", "NULL");
-        textTable.addRow(6, "ssa_filial_name", 4, "WS", "NULL");
-        textTable.addRow(7, "Samara", 1, "SM", "NULL");
-
-        System.out.println(textTable.render());
-
-        System.out.println();
-
-        final TextTable textTable2 = new TextTable("id", "name", "country_id", "code", "desc");
-        textTable2.setDecorEnabled(false);
-
-        textTable2.addRow(1, "Moscow0", 1, "MOS", "NULL");
-        textTable2.addRow(2, "New-York", 3, "NY", "NULL");
-        textTable2.addRow(3, "Kiev", 2, "KI", "NULL");
-        textTable2.addRow(6, "ssa_filial_name", 4, "WS", "NULL");
-        textTable2.addRow(7, "Samara0", 1, "SM", "NULL");
-
-        System.out.println(textTable2.render());
-
-
-        TextTable textTable3 = new TextTable(false,"Key", "Value");
-        textTable3.addRow("ssa_role_name", "Прикрепление сканированных подлинников документов");
-        textTable3.addRow("r_object_id", "004a000000057e9a");
-        textTable3.addRow("ssa_name", "Ответственный за сканирование ОРД");
-        textTable3.addRow("r_object_type", "nt_doc_role");
-        textTable3.addRow("i_vstamp", "2");
-        textTable3.addRow("ssa_filial_name", "Демонстрационная организация");
-        textTable3.addRow("sida_filial", "000b000000007536");
-        textTable3.addRow("ssa_role", "scanning");
-
-
-        System.out.println(textTable3.render());
-
-    }
 
     @Getter
     @Setter
@@ -183,6 +127,18 @@ public class TextTable {
 
         detectColumnSizes();
 
+        int terminalWidth = getTerminalWidth();
+
+        int[] copyOfColumnSizes = null;
+        if (terminalWidth != 0) {
+            while (terminalWidth < getTextTableWidth()) {
+                copyOfColumnSizes = Arrays.copyOf(columnSizes, columnSizes.length);
+
+                int longestIndex = getLongestColumnIndex();
+                columnSizes[longestIndex]--;
+            }
+        }
+
         sb.append(columnNames != null ? renderHeader() : renderDecor());
 
         if (isDecorEnabled()) sb.append('\n');
@@ -193,6 +149,10 @@ public class TextTable {
         }
 
         sb.append(renderDecor());
+
+        if (copyOfColumnSizes != null) {
+            columnSizes = copyOfColumnSizes;
+        }
 
         return sb.toString();
     }
@@ -215,10 +175,10 @@ public class TextTable {
 
     private String renderHeader() {
         return renderDecor() +
-                (isDecorEnabled() ? '\n' : "") +
-                renderLine(columnNames) +
-                '\n' +
-                renderDecor();
+            (isDecorEnabled() ? '\n' : "") +
+            renderLine(columnNames) +
+            '\n' +
+            renderDecor();
     }
 
     private String renderLine(Object[] cells) {
@@ -230,8 +190,12 @@ public class TextTable {
             if (i >= columnSizes.length) break;
 
             String n = String.valueOf(cells[i]);
-            if (n.length() > maxStringLength) {
-                n = n.substring(0, maxStringLength - 2) + "..";
+            if (n.length() > maxStringLength || n.length() > columnSizes[i]) {
+                int min = Math.min(maxStringLength, columnSizes[i]);
+
+                min = Math.max(0, min - 2);
+
+                n = n.substring(0, min) + "..";
             }
 
             if (isDecorEnabled()) sb.append(' ');
@@ -294,7 +258,7 @@ public class TextTable {
                     final int stringLength = string.length();
 
                     if (stringLength > columnSizes[j])
-                        columnSizes[j] = stringLength + 2;
+                        columnSizes[j] = stringLength + PADDING_COLUMN_NAMES;
                 }
             }
         }
@@ -313,9 +277,141 @@ public class TextTable {
                 final int stringLength = string.length();
 
                 if (stringLength > columnSizes[j])
-                    columnSizes[j] = stringLength + 3;
+                    columnSizes[j] = stringLength + PADDING_COLUMN;
             }
         }
+    }
+
+    private int getTextTableWidth() {
+        if (decorEnabled) {
+            return Arrays.stream(columnSizes).sum() + 7;
+        } else {
+            return Arrays.stream(columnSizes).sum();
+        }
+    }
+
+    private int getLongestColumnIndex() {
+        int max = 0;
+        int maxIndex = 0;
+        for (int index = 0; index < columnSizes.length; index++) {
+            if (columnSizes[index] > max) {
+                max = columnSizes[index];
+                maxIndex = index;
+            }
+        }
+        return maxIndex;
+    }
+
+    private static int getTerminalWidth() {
+        try {
+
+            int result = 0;
+
+            if(System.getProperty("_terminal_witdh") != null) {
+                result = Integer.parseInt(System.getProperty("_terminal_witdh"));
+            } else {
+                result = org.jline.terminal.TerminalBuilder.terminal().getWidth();
+            }
+
+            if(result == 0) return result;
+
+            return Math.max(result, 14);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException, IOException {
+/*
+		+----+--------------------+------------+------+------+
+		| id | name               | country_id | code | desc |
+		+----+--------------------+------------+------+------+
+		|  1 | Moscow             | 1          | MOS  | NULL |
+		|  2 | New-York           | 3          | NY   | NULL |
+		|  3 | Kiev               | 2          | KI   | NULL |
+		|  6 | Washington         | 3          | WS   | NULL |
+		|  7 | Samara             | 1          | SM   | NULL |
+		+----+--------------------+------------+------+------+
+
+		ssa_role_name  Прикрепление сканированных подлинников документов
+        r_object_id    004a000000057e9a
+        ssa_name       Ответственный за сканирование ОРД
+        r_object_type  nt_doc_role
+        i_vstamp       2
+        ssa_filial_nameДемонстрационная организация
+        sida_filial    000b000000007536
+        ssa_role       scanning
+
+*/
+
+        final TextTable textTable = new TextTable("id", "name", "country_id", "code", "desc");
+
+        textTable.addRow(1, "Moscow", 1, "MOS", "NULL");
+        textTable.addRow(2, "New-York", 3, "NY", "NULL");
+        textTable.addRow(3, "Kiev", 2, "KI", "NULL");
+        textTable.addRow(6, "ssa_filial_name", 4, "WS", "NULL");
+        textTable.addRow(7, "Samara", 1, "SM", "NULL");
+
+        System.out.println(textTable.render());
+
+        System.out.println();
+
+        final TextTable textTable2 = new TextTable("id", "name", "country_id", "code", "desc");
+        textTable2.setDecorEnabled(false);
+
+        textTable2.addRow(1, "Moscow0", 1, "MOS", "NULL");
+        textTable2.addRow(2, "New-York", 3, "NY", "NULL");
+        textTable2.addRow(3, "Kiev", 2, "KI", "NULL");
+        textTable2.addRow(6, "ssa_filial_name", 4, "WS", "NULL");
+        textTable2.addRow(7, "Samara0", 1, "SM", "NULL");
+
+        System.out.println(textTable2.render());
+
+
+        TextTable textTable3 = new TextTable(false, "Key", "Value");
+        textTable3.addRow("ssa_role_name", "Прикрепление сканированных подлинников документов");
+        textTable3.addRow("r_object_id", "004a000000057e9a");
+        textTable3.addRow("ssa_name", "Ответственный за сканирование ОРД");
+        textTable3.addRow("r_object_type", "nt_doc_role");
+        textTable3.addRow("i_vstamp", "2");
+        textTable3.addRow("ssa_filial_name", "Демонстрационная организация");
+        textTable3.addRow("sida_filial", "000b000000007536");
+        textTable3.addRow("ssa_role", "scanning");
+
+
+        System.out.println(textTable3.render());
+
+        System.out.println();
+
+
+        while (true) {
+            String line = new Scanner(System.in).nextLine();
+            if (line.isEmpty()) {
+                System.setProperty("_terminal_witdh", "300");
+            } else {
+                System.setProperty("_terminal_witdh", line);
+            }
+
+            System.out.println("go");
+
+            TextTable textTable4 = new TextTable(true);
+            textTable4.addRow(" -a", "--archive", "same as -dR --preserve=all");
+            textTable4.addRow(" ", "--attributes-only", "don't copy the file data, just the attributes");
+            textTable4.addRow(" -B", "--backup[=CONTROL]", "make a backup of each existing destination file 1 2 3 4 5 6 7 8 9 100 101 102 103 104 105 106 107 108 109 200 201 202 203 204");
+            textTable4.addRow(" -b", "", "like --backup but does not accept an argument");
+            textTable4.addRow(" ", "--copy-contents", "copy contents of special files when recursive");
+            textTable4.addRow(" -d", "", "same as --no-dereference --preserve=links");
+            textTable4.addRow(" -f", "--force", "if an existing destination file cannot be 1opened, remove it and try again (this option is ignored when the -n option is also used)");
+            System.out.println(textTable4.render());
+            System.out.println(textTable4.getTextTableWidth());
+
+            textTable4.setDecorEnabled(false);
+            System.out.println(textTable4.render());
+            System.out.println("ttw: " + textTable4.getTextTableWidth());
+
+            System.out.println("tw: " + getTerminalWidth());
+        }
+
     }
 
 }
