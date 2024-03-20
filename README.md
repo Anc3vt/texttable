@@ -6,8 +6,8 @@ To obtain a table like:
     | id | name               | country_id | code | desc |
     +----+--------------------+------------+------+------+
     |  1 | Moscow             | 1          | MOS  | NULL |
-    |  2 | New-York           | 3          | NY   | NULL |
-    |  3 | Kiyv               | 2          | KI   | NULL |
+    |  2 | New York           | 3          | NY   | NULL |
+    |  3 | Kiev               | 2          | KI   | NULL |
     |  6 | Washington         | 3          | WS   | NULL |
     |  7 | Samara             | 1          | SM   | NULL |
     +----+--------------------+------------+------+------+
